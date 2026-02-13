@@ -1,13 +1,12 @@
 // ===============================
 // PRACTICA 1 - TAREA 4
-// Control de ADC y PWM por UART
+// tipo string gestiona por la UART los periféricos 
 // Comandos: ADC, ADC(x), PWM(x)
 // ===============================
 
 #include <mbed.h>
 
 mbed::Ticker timerADC;
-
 const int pinADC = A0;
 const int pinPWM = 9;
 
@@ -94,9 +93,9 @@ void loop() {
       Serial.println(duty);
     }
 
-    // -------------------------
+   
     // Comando desconocido
-    // -------------------------
+    
     else {
       Serial.println("Comando no reconocido");
     }
