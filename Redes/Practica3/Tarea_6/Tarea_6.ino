@@ -1,8 +1,8 @@
 #include <WiFi.h>
 #include <time.h>
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
-#include <Wire.h>
+//#include <Adafruit_MPU6050.h>
+//#include <Adafruit_Sensor.h>
+//#include <Wire.h>
 
 
 // Tus credenciales
@@ -10,44 +10,28 @@ const char* ssid = "OPPOmiguel";
 const char* password = "12345679";
 
 // CONFIGURACIÓN DEL PC
-const char* host = "10.138.109.6"; 
+const char* host = " 10.101.89.6"; 
 const uint16_t port = 455;
 
 WiFiClient client;
 
 bool enviar = false;//para comprobar 
 
-Adafruit_MPU6050 mpu;
+//Adafruit_MPU6050 mpu;
 
 
 void setup() {
   Serial.begin(115200);
 
-  if (!mpu.begin()) {
-  Serial.println("Sensor init failed");
-  while (1)
-    delay(10);
-  }
+ // if (!mpu.begin()) {
+ // Serial.println("Sensor init failed");
+  //while (1)
+ //   delay(10);
+  //}
 
- Serial.println("MPU6050 Found!");
+ //Serial.println("MPU6050 Found!");
 
-  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-  
-  Serial.print("Accelerometer range set to: ");
-  switch (mpu.getAccelerometerRange()) {
-  case MPU6050_RANGE_2_G:
-    Serial.println("+-2G");
-    break;
-  case MPU6050_RANGE_4_G:
-    Serial.println("+-4G");
-    break;
-  case MPU6050_RANGE_8_G:
-    Serial.println("+-8G");
-    break;
-  case MPU6050_RANGE_16_G:
-    Serial.println("+-16G");
-    break;
-  }
+  //mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
 
   // Conexión WiFi
   WiFi.begin(ssid, password);
@@ -63,6 +47,7 @@ void setup() {
 void loop() {
  
 
+  
   if (!client.connected()) {
     Serial.println("Conectando al servidor...");
     if (client.connect(host, port)) {
@@ -88,18 +73,20 @@ void loop() {
 
     //
     if (enviar) {
-      sensors_event_t a, g, temp;
-      mpu.getEvent(&a, &g, &temp);
+      //sensors_event_t a, g, temp;
+      //mpu.getEvent(&a, &g, &temp);
 
-      // Enviamos al PC 
-      client.print("AX:"); client.print(a.acceleration.x);
-      client.print(", AY:"); client.print(a.acceleration.y);
-      client.print(", AZ:"); client.println(a.acceleration.z);
+          float ax = random(-100,100) / 100.0;
+          float ay = random(-100,100) / 100.0;
+          float az = random(-100,100) / 100.0;
 
-      // Monitor Serie 
-      Serial.print("Enviando -> X: "); Serial.print(a.acceleration.x);
-      Serial.print(" Y: "); Serial.print(a.acceleration.y);
-      Serial.print(" Z: "); Serial.println(a.acceleration.z);
+           String data = String(ax) + ";" + String(ay) + ";" + String(az);
+
+           client.println(data);
+
+            Serial.println(data);
+
+      
     }
     
     // ---------------------------------
