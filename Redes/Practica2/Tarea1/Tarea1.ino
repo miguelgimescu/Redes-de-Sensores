@@ -1,19 +1,43 @@
+//void tareaLED(void *pvParameters) {
+//  ledcSetup(0, 5000, 8);
+//  ledcAttachPin(GPIO_NUM_4, 0);
 
-#define PIN_LED 2  
+//  while (true) {
+//    ledcWrite(0, 8);            // encendido suave se puede subir hasta 255 si se usa high te deja ciego
+//    vTaskDelay(pdMS_TO_TICKS(200));
+//    ledcWrite(0, 0);            // apagado
+//    vTaskDelay(pdMS_TO_TICKS(200));
+//  }
+//}
 
-// Tarea 1: parpadeo de LED cada 200ms
+#define FLASH_GPIO      4
+#define PWM_CHANNEL     7
+#define PWM_FREQ        5000
+#define PWM_RESOLUTION  8
+
+int intensidad = 2;   // cambia aquí 0-255 si es mucho te deja ciego por eso no usar high
+
 void tareaLED(void *pvParameters) {
-  pinMode(GPIO_NUM_4, OUTPUT);
+
+  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttachPin(FLASH_GPIO, PWM_CHANNEL);
 
   while (true) {
-    digitalWrite(GPIO_NUM_4, 1);//me dejo ciego
+
+    // ENCENDIDO
+    ledcWrite(PWM_CHANNEL, intensidad);
+
+    //Serial.printf("Intensidad: %d\n", intensidad);
+
     vTaskDelay(pdMS_TO_TICKS(200));
-    digitalWrite(GPIO_NUM_4, LOW);
+
+    // APAGADO
+    ledcWrite(PWM_CHANNEL, 0);
+
     vTaskDelay(pdMS_TO_TICKS(200));
   }
 }
 
-// Tarea 2: enviar "Hola mundo" por UART cada segundo
 void tareaUART(void *pvParameters) {
   while (true) {
     Serial.println("Hola mundo");
@@ -23,28 +47,8 @@ void tareaUART(void *pvParameters) {
 
 void setup() {
   Serial.begin(115200);
-
-  xTaskCreate(
-    tareaLED,     // función de la tarea
-    "LED",        // nombre (debug)
-    1000,         // tamaño del stack (words)
-    NULL,         // parámetros
-    1,            // prioridad
-    NULL          // handle (no lo necesitamos)
-  );
-
-  xTaskCreate(
-    tareaUART,
-    "UART",
-    1000,
-    NULL,
-    1,
-    NULL
-  );
-
-  // En ESP32 con FreeRTOS el scheduler arranca solo, no hace falta vTaskStartScheduler()
+  xTaskCreate(tareaLED,  "LED",  1000, NULL, 1, NULL);
+  xTaskCreate(tareaUART, "UART", 1000, NULL, 1, NULL);
 }
 
-void loop() {
-  // Vacío: todo corre en las tareas
-}
+void loop() {}
